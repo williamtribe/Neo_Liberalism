@@ -1,5 +1,6 @@
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
+import { supabase } from "@/lib/supabase"
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
@@ -103,29 +104,80 @@ export async function GET(request: NextRequest) {
     }
 
     const userData = await userResponse.json()
-    console.log("사용자 정보 조회 성공:", { id: userData.id })
-
-    // NextResponse 객체 생성
-    const response = NextResponse.redirect(new URL("/", request.url))
-    
-    // 쿠키 설정을 NextResponse 객체에 적용
-    response.cookies.set("kakao_access_token", tokenData.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: tokenData.expires_in,
-      path: "/",
+    console.log("사용자 정보 조회 성공:", { 
+      id: userData.id,
+      nickname: userData.properties?.nickname,
+      profile_image: userData.properties?.profile_image,
+      email: userData.kakao_account?.email 
     })
 
-    response.cookies.set("user_id", userData.id.toString(), {
+    // Supabase에 사용자 정보 저장/업데이트
+    console.log("Supabase 사용자 조회 시작...")
+    const { data: existingUser, error: selectError } = await supabase
+      .from('users')
+      .select()
+      .eq('kakao_id', userData.id)
+      .single();
+
+    console.log("Supabase 사용자 조회 결과:", { existingUser, selectError })
+
+    let userId;
+    if (!existingUser) {
+      // 새 사용자 생성
+      console.log("새 사용자 생성 시작...")
+      const { data: newUser, error: insertError } = await supabase
+        .from('users')
+        .insert([
+          {
+            kakao_id: userData.id.toString(),
+            nickname: userData.properties?.nickname || null,
+            profile_image: userData.properties?.profile_image || null,
+            email: userData.kakao_account?.email || null
+          },
+        ])
+        .select()
+        .single();
+
+      console.log("새 사용자 생성 결과:", { newUser, insertError })
+      
+      if (insertError) {
+        console.error('Error creating new user:', insertError);
+        return NextResponse.redirect('/login?error=db_error');
+      }
+      
+      userId = newUser.id;
+    } else {
+      // 기존 사용자 정보 업데이트
+      const { data: updatedUser, error: updateError } = await supabase
+        .from('users')
+        .update({
+          nickname: userData.properties?.nickname || null,
+          profile_image: userData.properties?.profile_image || null,
+          email: userData.kakao_account?.email || null
+        })
+        .eq('kakao_id', userData.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error('Error updating user:', updateError);
+        return NextResponse.redirect('/login?error=db_error');
+      }
+      
+      userId = existingUser.id;
+    }
+
+    // 쿠키에 사용자 ID 저장
+    cookies().set('user_id', userId.toString(), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7일
-      path: "/",
-    })
+    });
 
-    console.log("쿠키 설정 완료: 사용자 ID:", userData.id)
+    console.log("쿠키 설정 완료: 사용자 ID:", userId)
     
-    return response
+    return NextResponse.redirect('/');
   } catch (error) {
     console.error("카카오 로그인 에러:", error instanceof Error ? error.message : error)
     return NextResponse.redirect(new URL("/login?error=auth_failed", request.url))

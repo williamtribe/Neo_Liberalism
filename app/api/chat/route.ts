@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { Pinecone } from '@pinecone-database/pinecone';
-import { PineconeStore } from '@langchain/community/vectorstores/pinecone';
+import { PineconeStore } from '@langchain/pinecone';
 import { ChatOpenAI } from '@langchain/openai';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { RunnableSequence } from '@langchain/core/runnables';
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
       
       // 3. OpenAI 임베딩 초기화 (text-embedding-3-large는 3072 차원)
       const embeddings = new OpenAIEmbeddings({
-        apiKey: OPENAI_API_KEY,
+        openAIApiKey: OPENAI_API_KEY,
         modelName: "text-embedding-3-large", // 3072 차원 벡터 생성
         dimensions: 3072, // Pinecone 인덱스 차원과 일치하도록 설정
       });
@@ -112,17 +112,17 @@ export async function POST(request: Request) {
       // 5. 검색기 생성
       const retriever = vectorStore.asRetriever({
         searchType: "similarity",
-        k: 10, // 상위 5개 문서 검색
+        k: 10, // 상위 10개 문서 검색 (기존 5개에서 변경)
       });
       
       // 6. 문서 검색
       console.log(`"${message}" 관련 문서 검색 중...`);
       const docs = await retriever.invoke(message);
-      const contextText = docs.map(doc => doc.pageContent).join("\n\n");
+      const contextText = docs.map((doc: { pageContent: string }) => doc.pageContent).join("\n\n");
       
       // 7. OpenAI 모델 초기화
       const model = new ChatOpenAI({
-        apiKey: OPENAI_API_KEY,
+        openAIApiKey: OPENAI_API_KEY,
         modelName: "gpt-4o-mini",
         temperature: 0.7,
       });

@@ -80,12 +80,12 @@ export default function ChatBot() {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-lg">
-      <CardHeader>
-        <CardTitle className="text-center">챗봇</CardTitle>
+    <Card className="w-full max-w-3xl shadow-lg border-2 border-blue-200">
+      <CardHeader className="bg-blue-50">
+        <CardTitle className="text-center text-xl">챗봇</CardTitle>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[400px] pr-4">
+        <ScrollArea className="h-[500px] pr-4">
           <div className="space-y-4">
             {messages.map((message, index) => (
               <div

@@ -41,15 +41,15 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-4xl font-bold mb-8">AI 챗봇 서비스</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-b from-white to-blue-50">
+      <h1 className="text-4xl font-bold mb-8 text-red-600">자유주의자 챗봇</h1>
       
       {loading ? (
         <p className="text-xl mb-8">로딩 중...</p>
       ) : isLoggedIn ? (
-        <div className="w-full max-w-4xl">
-          <div className="flex justify-between items-center mb-8">
-            <p className="text-sm text-gray-600">사용자 ID: {userId}</p>
+        <div className="w-full max-w-5xl flex flex-col items-center">
+          <div className="w-full flex justify-between items-center mb-8 px-4 py-2 bg-blue-100 rounded-lg">
+            <p className="text-md text-blue-700 font-semibold">사용자 ID: {userId}</p>
             <LogoutButton />
           </div>
           
