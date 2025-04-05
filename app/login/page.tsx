@@ -40,8 +40,8 @@ export default function KakaoLogin() {
           <Image
             src="/Rhee_quote.jpg"
             alt="카카오 로고"
-            width={120}
-            height={120}
+            width={480}
+            height={480}
             priority
           />
         </div>
