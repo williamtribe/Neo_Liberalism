@@ -80,7 +80,7 @@ export default function ChatBot() {
   };
 
   return (
-    <Card className="w-full max-w-3xl shadow-lg border-2 border-blue-200">
+    <Card className="w-full max-w-3xl shadow-lg border-2 border-blue-200 mx-auto">
       <CardHeader className="bg-blue-50">
         <CardTitle className="text-center text-xl">챗봇</CardTitle>
       </CardHeader>
