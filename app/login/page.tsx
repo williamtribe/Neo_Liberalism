@@ -38,7 +38,7 @@ export default function KakaoLogin() {
         {/* 예: public 폴더의 /images/kakao-login.png 를 사용 */}
         <div className="mb-4">
           <Image
-            src="Rhee_quote.jpg"
+            src="/Rhee_quote.jpg"
             alt="카카오 로고"
             width={480}
             height={480}
