@@ -80,49 +80,52 @@ export default function ChatBot() {
   };
 
   return (
-    <Card className="w-full max-w-3xl shadow-lg border-2 border-blue-200 mx-auto">
-      <CardHeader className="bg-blue-50">
-        <CardTitle className="text-center text-xl">챗봇</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[500px] pr-4">
-          <div className="space-y-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
+    // 부모 래퍼에 min-h-screen + flex + center 정렬
+    <div className="flex items-center justify-center min-h-screen p-4 bg-white">
+      <Card className="w-full max-w-3xl shadow-lg border-2 border-blue-200">
+        <CardHeader className="bg-blue-50">
+          <CardTitle className="text-center text-xl">챗봇</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[500px] pr-4">
+            <div className="space-y-4">
+              {messages.map((message, index) => (
                 <div
-                  className={`px-4 py-2 rounded-lg max-w-[80%] ${
-                    message.role === "user"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-800"
+                  key={index}
+                  className={`flex ${
+                    message.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {message.content}
+                  <div
+                    className={`px-4 py-2 rounded-lg max-w-[80%] ${
+                      message.role === "user"
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-800"
+                    }`}
+                  >
+                    {message.content}
+                  </div>
                 </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollArea>
-      </CardContent>
-      <CardFooter>
-        <form onSubmit={handleSendMessage} className="flex w-full gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="메시지를 입력하세요..."
-            disabled={isLoading}
-            className="flex-1"
-          />
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "전송 중..." : "전송"}
-          </Button>
-        </form>
-      </CardFooter>
-    </Card>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
+        </CardContent>
+        <CardFooter>
+          <form onSubmit={handleSendMessage} className="flex w-full gap-2">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="메시지를 입력하세요..."
+              disabled={isLoading}
+              className="flex-1"
+            />
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "전송 중..." : "전송"}
+            </Button>
+          </form>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }
